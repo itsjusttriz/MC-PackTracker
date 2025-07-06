@@ -1,0 +1,30 @@
+{
+    "name": "FTB-PackTracker-Discord",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "nodemon --config nodemon.json",
+        "build": "tsc",
+        "start": "node .",
+        "cleanup": "rm -rf dist node_modules package-lock.json"
+    },
+    "keywords": [],
+    "author": "OperatorTriz",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "@types/node": "^24.0.10",
+        "drizzle-kit": "^0.31.4",
+        "nodemon": "^3.1.10",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "@libsql/client": "^0.15.9",
+        "axios": "^1.10.0",
+        "discord.js": "^14.21.0",
+        "dotenv": "^17.0.1",
+        "drizzle-orm": "^0.44.2",
+        "node-cron": "^4.2.0",
+        "zod": "^3.25.67"
+    }
+}
