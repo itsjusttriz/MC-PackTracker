@@ -1,4 +1,5 @@
 *.env
 *.db
+*.xcf
 package-lock.json
 node_modules
