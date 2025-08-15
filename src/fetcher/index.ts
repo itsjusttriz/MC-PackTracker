@@ -17,7 +17,7 @@ export const fetch = async (id: string) => {
 	try {
 		const req = await client.get(`/${id}`, {
 			validateStatus: function (status) {
-				return status < 300; // Resolve only if the status code is less than 500
+				return status < 300; // Resolve only if the status code is less than 300
 			},
 		});
 		return req.data;
@@ -42,11 +42,6 @@ export const startProcessing = async (c: Discord.Client) => {
 	const modpacks = await Drizzle.getAllTrackedModpacks();
 	const startTime = Date.now();
 
-	// let time = new Date().toLocaleTimeString('en-IE', {
-	// 	hour12: false,
-	// });
-	// console.log(`[${time}] Starting hourly API fetches...`);
-
 	for (const pack of modpacks) {
 		if (!idCache.has(+pack.modpackId)) {
 			const data = await fetch(pack.modpackId);
@@ -65,11 +60,6 @@ export const startProcessing = async (c: Discord.Client) => {
 		await new Promise((res) => setTimeout(res, 5000));
 	}
 
-	// time = new Date().toLocaleTimeString('en-IE', {
-	// 	hour12: false,
-	// });
-	// console.log(`[${time}] Finished hourly API fetches, cleaning up...`);
-
 	if (!!idCache.size) idCache.clear();
 };
 
@@ -82,14 +72,7 @@ export const testForVersionChange = async (
 	const oldVersion = dbItem.latestModpackVersionId;
 	const newMatchesOld =
 		oldVersion && oldVersion === String(modpack.latest.id);
-	if (newMatchesOld) {
-		// const diff = { oldVersion, newVersion: String(modpack.latest.id) };
-		// console.log(
-		// 	`[${modpack.name}] New file ID matches old file ID. Skipping...`,
-		// 	diff
-		// );
-		return;
-	}
+	if (newMatchesOld) return;
 
 	const embed = new Discord.EmbedBuilder()
 		.setColor('#5c1f19')
