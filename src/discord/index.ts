@@ -6,23 +6,21 @@ import { DiscordInteractionCreateEvent } from './events/onInteractionCreate';
 import type { MCPackTracker } from '..';
 import type { CommandCollection, CommandData } from './types';
 
-// TODO: Remove the old imports.
-import Env from '../env';
-
 export class DiscordBot {
+	private readonly _token: string;
+	private readonly _client = new Client({
+		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+	});
 	private _commands: CommandCollection = new Collection<
 		string,
 		CommandData
 	>();
 
-	private _client = new Client({
-		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
-	});
+	constructor(private _app: MCPackTracker) {
+		this._token = _app._env.discordToken;
+	}
 
-	constructor(private _app: MCPackTracker) {}
-
-	// TODO: Maybe remove 'async'?
-	async login() {
+	login() {
 		this._client.on(
 			Events.ClientReady,
 			(c) => new DiscordReadyEvent(c, this._commands)
@@ -33,6 +31,6 @@ export class DiscordBot {
 			(i) => new DiscordInteractionCreateEvent(this._commands, i)
 		);
 
-		await this._client.login(Env.DISCORD_TOKEN);
+		return this._client.login(this._token);
 	}
 }
