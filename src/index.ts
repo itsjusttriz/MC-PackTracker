@@ -1,5 +1,5 @@
 import { DiscordBot } from './discord';
-import { EnvService } from './env';
+import { EnvService } from './services/EnvService';
 
 export class MCPackTracker {
 	_discordBot = new DiscordBot(this);
