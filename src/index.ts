@@ -1,5 +1,9 @@
 import * as Discord from './discord';
 
-(async () => {
-	await Discord.Client.login();
-})();
+class MCPackTracker {
+	static async start() {
+		await Discord.Client.login();
+	}
+}
+
+MCPackTracker.start();
