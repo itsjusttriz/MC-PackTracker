@@ -1,9 +1,11 @@
 import * as z from 'zod';
-import * as dotenv from 'dotenv';
-import * as path from 'node:path';
+import { config } from 'dotenv';
+import { resolve } from 'node:path';
 
-dotenv.config({
-	path: path.resolve(__dirname, '../../.env'),
+import { EnvironmentValidationError } from '../util/errors';
+
+config({
+	path: resolve(__dirname, '../../.env'),
 });
 
 const schema = z.object({
@@ -12,15 +14,29 @@ const schema = z.object({
 	DISCORD_TOKEN: z.string().nonempty('DISCORD_TOKEN is required'),
 	AGENT: z.string(),
 });
-export type Env = z.infer<typeof schema>;
+export type EnvObject = z.infer<typeof schema>;
+export class EnvService {
+	private readonly _data: EnvObject;
+	private readonly _env = schema.safeParse(process.env);
 
-const env = schema.safeParse(process.env);
-if (!env.success) {
-	throw new Error(
-		`Environment variable validation failed: ${JSON.stringify(
-			env.error.flatten()
-		)}`
-	);
+	constructor() {
+		if (!this._env.success) {
+			const error = JSON.stringify(this._env.error.flatten());
+			throw new EnvironmentValidationError(error);
+		}
+		this._data = this._env.data;
+	}
+
+	get dbFileName() {
+		return this._data.DB_FILE_NAME;
+	}
+	get discordAppId() {
+		return this._data.DISCORD_APP_ID;
+	}
+	get discordToken() {
+		return this._data.DISCORD_TOKEN;
+	}
+	get agent() {
+		return this._data.AGENT;
+	}
 }
-
-export default env.data as Env;

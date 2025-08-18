@@ -6,3 +6,4 @@ class CustomError extends Error {
 }
 
 export class InvalidCommandError extends CustomError {}
+export class EnvironmentValidationError extends CustomError {}
