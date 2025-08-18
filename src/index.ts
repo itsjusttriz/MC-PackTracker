@@ -1,10 +1,12 @@
 import { DiscordBot } from './discord';
 
-class MCPackTracker {
-	static async start() {
-		const discordBot = new DiscordBot();
-		await discordBot.login();
+export class MCPackTracker {
+	_discordBot = new DiscordBot(this);
+
+	async start() {
+		await this._discordBot.login();
 	}
 }
 
-MCPackTracker.start();
+const app = new MCPackTracker();
+app.start();
