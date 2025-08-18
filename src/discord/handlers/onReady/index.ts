@@ -1,7 +1,7 @@
 import * as Discord from 'discord.js';
 import * as Cron from 'node-cron';
 
-import * as Client from '../../client';
+import * as Client from '../..';
 import * as Fetcher from '../../../fetcher';
 
 import * as GuildRegistry from './GuildRegistry';

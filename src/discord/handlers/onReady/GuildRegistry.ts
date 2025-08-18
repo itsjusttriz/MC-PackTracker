@@ -1,4 +1,4 @@
-import * as Client from '../../client';
+import * as Client from '../..';
 
 export const log = (c: Client.HandlerContext['client']) =>
 	new Promise(async (res) => {

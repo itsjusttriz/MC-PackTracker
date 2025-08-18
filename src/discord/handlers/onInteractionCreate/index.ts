@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js';
 
-import * as Client from '../../client';
+import * as Client from '../..';
 
 import * as GuildSettingsChecker from './GuildSettingsChecker';
 

@@ -1,5 +1,5 @@
 import * as Discord from 'discord.js';
-import * as Client from '../../client';
+import * as Client from '../..';
 
 export const set = (c: Client.HandlerContext['client']) =>
 	new Promise((res) => {

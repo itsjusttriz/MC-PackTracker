@@ -1,8 +1,9 @@
-import * as Discord from './discord';
+import { DiscordBot } from './discord';
 
 class MCPackTracker {
 	static async start() {
-		await Discord.Client.login();
+		const discordBot = new DiscordBot();
+		await discordBot.login();
 	}
 }
 

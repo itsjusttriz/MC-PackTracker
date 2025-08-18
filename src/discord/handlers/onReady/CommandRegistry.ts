@@ -2,7 +2,7 @@ import * as Discord from 'discord.js';
 import * as Path from 'node:path';
 import * as FS from 'node:fs/promises';
 
-import * as Client from '../../client';
+import * as Client from '../..';
 
 import Env from '../../../env';
 
