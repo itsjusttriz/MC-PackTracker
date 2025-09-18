@@ -16,10 +16,18 @@ const schema = z.object({
 });
 export type EnvObject = z.infer<typeof schema>;
 export class EnvService {
+	private static instance: EnvService;
+
 	private readonly _data: EnvObject;
 	private readonly _env = schema.safeParse(process.env);
 
-	constructor() {
+	public static getInstance() {
+		if (!EnvService.instance) EnvService.instance = new EnvService();
+
+		return EnvService.instance;
+	}
+
+	private constructor() {
 		if (!this._env.success) {
 			const error = JSON.stringify(this._env.error.flatten());
 			throw new EnvironmentValidationError(error);

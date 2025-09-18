@@ -1,113 +1,128 @@
-import * as DrizzleNode from 'drizzle-orm/libsql/node';
-import * as LibSQL from '@libsql/client';
-import * as Drizzle from 'drizzle-orm';
-import * as path from 'node:path';
+import { and, eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/libsql/node';
+import { EnvService } from '../services/EnvService';
+import { schema } from './schema';
+import { resolve } from 'node:path';
 
-import Env from '../env';
+export class DrizzleDB {
+	private static instance: DrizzleDB;
 
-import * as Schema from './schema';
-export * as Schema from './schema';
+	private db;
 
-const client = LibSQL.createClient({
-	url: `file:${path.resolve(__dirname, '../../', Env.DB_FILE_NAME)}`,
-});
-export const db = DrizzleNode.drizzle({
-	client,
-	schema: Schema,
-});
+	get _schema() {
+		return schema;
+	}
 
-export const getGuildSettings = (id: string) => {
-	return db
-		.select()
-		.from(Schema.guildSettings)
-		.where(Drizzle.eq(Schema.guildSettings.guildId, id));
-};
+	public static getInstance() {
+		if (!DrizzleDB.instance) {
+			DrizzleDB.instance = new DrizzleDB();
+		}
+		return DrizzleDB.instance;
+	}
 
-export const createGuildSettings = async (guildId: string, roleId: string) => {
-	const query = await db.insert(Schema.guildSettings).values({
-		guildId,
-		editorRoleId: roleId,
-	});
-
-	return !!query.rowsAffected;
-};
-
-export const deleteTrackedModpackById = async (id: string) => {
-	const query = await db
-		.delete(Schema.trackedModpacks)
-		.where(Drizzle.eq(Schema.trackedModpacks.id, id));
-
-	return !!query.rowsAffected;
-};
-
-export const getTrackedModpackById = (id: string) => {
-	return db
-		.select()
-		.from(Schema.trackedModpacks)
-		.where(Drizzle.eq(Schema.trackedModpacks.id, id));
-};
-
-export const getTrackedModpack = (
-	modpackId: string,
-	channelId: string,
-	guildId: string
-) => {
-	return db
-		.select()
-		.from(Schema.trackedModpacks)
-		.where(
-			Drizzle.and(
-				Drizzle.eq(Schema.trackedModpacks.modpackId, modpackId),
-				Drizzle.eq(Schema.trackedModpacks.channelId, channelId),
-				Drizzle.eq(Schema.trackedModpacks.guildId, guildId)
-			)
+	private constructor() {
+		const env = EnvService.getInstance();
+		this.db = drizzle(
+			'file:' + resolve(__dirname, '../../', env.dbFileName),
+			{
+				schema,
+			}
 		);
-};
+	}
 
-export const getAllTrackedModpacks = () => {
-	return db.select().from(Schema.trackedModpacks);
-};
+	getGuildSettings = (id: string) => {
+		return this.db
+			.select()
+			.from(schema.guildSettings)
+			.where(eq(schema.guildSettings.guildId, id));
+	};
 
-export const getTrackedModpacks = (guildId: string) => {
-	return db
-		.select()
-		.from(Schema.trackedModpacks)
-		.where(Drizzle.eq(Schema.trackedModpacks.guildId, guildId));
-};
+	createGuildSettings = async (guildId: string, roleId: string) => {
+		const query = await this.db.insert(schema.guildSettings).values({
+			guildId,
+			editorRoleId: roleId,
+		});
 
-export const addTrackedModpack = async (
-	modpackId: string,
-	channelId: string,
-	guildId: string,
-	trackerAuthorId: string
-) => {
-	const query = await db.insert(Schema.trackedModpacks).values({
-		modpackId,
-		channelId,
-		guildId,
-		trackerAuthorId,
-	});
-	return !!query.rowsAffected;
-};
+		return !!query.rowsAffected;
+	};
 
-export const updateTrackedModpackLatestId = async (
-	modpackId: string,
-	channelId: string,
-	guildId: string,
-	fileId: string
-) => {
-	const query = await db
-		.update(Schema.trackedModpacks)
-		.set({
-			latestModpackVersionId: fileId,
-		})
-		.where(
-			Drizzle.and(
-				Drizzle.eq(Schema.trackedModpacks.modpackId, modpackId),
-				Drizzle.eq(Schema.trackedModpacks.channelId, channelId),
-				Drizzle.eq(Schema.trackedModpacks.guildId, guildId)
-			)
-		);
+	deleteTrackedModpackById = async (id: string) => {
+		const query = await this.db
+			.delete(schema.trackedModpacks)
+			.where(eq(schema.trackedModpacks.id, id));
 
-	return !!query.rowsAffected;
-};
+		return !!query.rowsAffected;
+	};
+
+	getTrackedModpackById = (id: string) => {
+		return this.db
+			.select()
+			.from(schema.trackedModpacks)
+			.where(eq(schema.trackedModpacks.id, id));
+	};
+
+	getTrackedModpack = (
+		modpackId: string,
+		channelId: string,
+		guildId: string
+	) => {
+		return this.db
+			.select()
+			.from(schema.trackedModpacks)
+			.where(
+				and(
+					eq(schema.trackedModpacks.modpackId, modpackId),
+					eq(schema.trackedModpacks.channelId, channelId),
+					eq(schema.trackedModpacks.guildId, guildId)
+				)
+			);
+	};
+
+	getAllTrackedModpacks = () => {
+		return this.db.select().from(schema.trackedModpacks);
+	};
+
+	getTrackedModpacks = (guildId: string) => {
+		return this.db
+			.select()
+			.from(schema.trackedModpacks)
+			.where(eq(schema.trackedModpacks.guildId, guildId));
+	};
+
+	addTrackedModpack = async (
+		modpackId: string,
+		channelId: string,
+		guildId: string,
+		trackerAuthorId: string
+	) => {
+		const query = await this.db.insert(schema.trackedModpacks).values({
+			modpackId,
+			channelId,
+			guildId,
+			trackerAuthorId,
+		});
+		return !!query.rowsAffected;
+	};
+
+	updateTrackedModpackLatestId = async (
+		modpackId: string,
+		channelId: string,
+		guildId: string,
+		fileId: string
+	) => {
+		const query = await this.db
+			.update(schema.trackedModpacks)
+			.set({
+				latestModpackVersionId: fileId,
+			})
+			.where(
+				and(
+					eq(schema.trackedModpacks.modpackId, modpackId),
+					eq(schema.trackedModpacks.channelId, channelId),
+					eq(schema.trackedModpacks.guildId, guildId)
+				)
+			);
+
+		return !!query.rowsAffected;
+	};
+}

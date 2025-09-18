@@ -7,6 +7,6 @@ export default defineConfig({
 	schema: './src/drizzle/schema.ts',
 	dialect: 'sqlite',
 	dbCredentials: {
-		url: `file:${path.join(__dirname, process.env.DB_FILE_NAME!)}`,
+		url: `file:${join(__dirname, process.env.DB_FILE_NAME!)}`,
 	},
 });

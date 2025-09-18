@@ -1,6 +1,6 @@
 import { ChatInputCommandInteraction, MessageFlags } from 'discord.js';
 import { EmbedService } from './EmbedService';
-import { getGuildSettings } from '../drizzle';
+import { DrizzleDB } from '../drizzle';
 
 export class GuildConfigurationService {
 	private static _embed = EmbedService.buildErrorEmbed(
@@ -8,11 +8,9 @@ export class GuildConfigurationService {
 	);
 
 	static async check(i: ChatInputCommandInteraction) {
-		const [guildSettings] = await getGuildSettings(i.guild!.id);
-		if (!guildSettings?.editorRoleId) {
-			return false;
-		}
-		return true;
+		const db = DrizzleDB.getInstance();
+		const [guildSettings] = await db.getGuildSettings(i.guild!.id);
+		return !!guildSettings?.editorRoleId || false;
 	}
 
 	static sendErrorEmbed(i: ChatInputCommandInteraction) {

@@ -1,6 +1,6 @@
 import { MessageFlags, type Interaction } from 'discord.js';
 
-import type { CommandCollection } from '../types';
+import { DiscordBot } from '../../discord';
 
 import { InvalidCommandError } from '../../util/errors';
 
@@ -8,11 +8,8 @@ import { GuildConfigurationService } from '../../services/GuildConfigurationServ
 import { GuildPermissionService } from '../../services/GuildPermissionService';
 
 export class DiscordInteractionCreateEvent {
-	constructor(
-		private _commands: CommandCollection,
-		interaction: Interaction
-	) {
-		this.handle(interaction);
+	constructor(i: Interaction) {
+		this.handle(i);
 	}
 
 	async handle(i: Interaction) {
@@ -41,7 +38,8 @@ export class DiscordInteractionCreateEvent {
 		});
 
 		try {
-			const cmd = this._commands.get(i.commandName);
+			const discordBot = DiscordBot.getInstance();
+			const cmd = discordBot.commands.get(i.commandName);
 			if (!cmd)
 				throw new InvalidCommandError(
 					`${i.commandName} doesn't exist.`
