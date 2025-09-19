@@ -1,5 +1,3 @@
-// TODO: Refactor this to allow for CF & FTB.
-
 import { DrizzleDB } from '../../drizzle';
 import {
 	SlashCommandBuilder,
@@ -7,18 +5,18 @@ import {
 	type GuildMember,
 } from 'discord.js';
 import CommandBase from './CommandBase';
-import { FtbApi } from '../../lib/FtbApiLibrary';
+import { CurseforgeApi } from '../../lib/CurseforgeApiLibrary';
 
 export default class extends CommandBase {
 	metadata = new SlashCommandBuilder()
-		.setName('track')
-		.setDescription('Track an FTB modpack')
+		.setName('track-cf')
+		.setDescription('Track a Curseforge modpack')
 		.addIntegerOption((option) => {
 			return option
 				.setName('modpack-id')
 				.setRequired(true)
 				.setDescription(
-					"You'll find this ID in the lower-right area of the modpack's project page on the FTB Website."
+					"You'll find this ID in the right side of the modpack's project page on the Curseforge Website."
 				);
 		})
 		.toJSON();
@@ -40,8 +38,10 @@ export default class extends CommandBase {
 
 		let modpackId = i.options.getInteger('modpack-id', true)?.toString();
 
-		const ftbApi = FtbApi.getInstance();
-		const req = await ftbApi.fetch(modpackId);
+		const curseforgeApi = CurseforgeApi.getInstance();
+		const { data: req } = await curseforgeApi.fetch(modpackId);
+
+		// console.log(req);
 
 		if (req?.id?.toString() !== modpackId) {
 			await i.editReply(
@@ -50,7 +50,7 @@ export default class extends CommandBase {
 			return;
 		}
 
-		const converted = ftbApi.convertRequestData(req);
+		const converted = curseforgeApi.convertRequestData(req);
 
 		const [existingTracker] = await db.getTrackedModpack(
 			modpackId,
@@ -65,6 +65,7 @@ export default class extends CommandBase {
 		}
 
 		const newTracker = await db.addTrackedModpack(
+			'curseforge',
 			modpackId,
 			i.channel!.id,
 			i.guild!.id,
@@ -83,7 +84,11 @@ export default class extends CommandBase {
 			i.guild!.id
 		);
 
-		ftbApi.testForVersionChange(storedTracker, converted, Date.now());
+		curseforgeApi.testForVersionChange(
+			storedTracker,
+			converted,
+			Date.now()
+		);
 
 		await i.editReply(
 			`:white_check_mark: Tracking project ${converted.id}: ${converted.name}...`

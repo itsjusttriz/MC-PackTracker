@@ -90,12 +90,14 @@ export class DrizzleDB {
 	};
 
 	addTrackedModpack = async (
+		launcher: 'ftb' | 'curseforge',
 		modpackId: string,
 		channelId: string,
 		guildId: string,
 		trackerAuthorId: string
 	) => {
 		const query = await this.db.insert(schema.trackedModpacks).values({
+			launcher,
 			modpackId,
 			channelId,
 			guildId,
