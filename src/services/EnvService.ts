@@ -12,6 +12,7 @@ const schema = z.object({
 	DB_FILE_NAME: z.string().nonempty('DB_FILE_NAME is required'),
 	DISCORD_APP_ID: z.string().nonempty('DISCORD_APP_ID is required'),
 	DISCORD_TOKEN: z.string().nonempty('DISCORD_TOKEN is required'),
+	CURSEFORGE_TOKEN: z.string().nonempty('CURSEFORGE_TOKEN is required'),
 	AGENT: z.string(),
 });
 export type EnvObject = z.infer<typeof schema>;
@@ -43,6 +44,9 @@ export class EnvService {
 	}
 	get discordToken() {
 		return this._data.DISCORD_TOKEN;
+	}
+	get curseforgeToken() {
+		return this._data.CURSEFORGE_TOKEN;
 	}
 	get agent() {
 		return this._data.AGENT;

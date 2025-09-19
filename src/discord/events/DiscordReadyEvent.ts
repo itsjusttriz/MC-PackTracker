@@ -1,5 +1,6 @@
 import { DiscordBot } from '../../discord';
 
+import { CurseforgeApi } from '../../lib/CurseforgeApiLibrary';
 import { FtbApi } from '../../lib/FtbApiLibrary';
 
 import { CommandRegistryService } from '../../services/CommandRegistryService';
@@ -26,10 +27,14 @@ export class DiscordReadyEvent {
 		const ftbApi = FtbApi.getInstance();
 		await ftbApi.startProcessing();
 
+		const curseforgeApi = CurseforgeApi.getInstance();
+		await curseforgeApi.startProcessing();
+
 		const scheduler = CronService.getInstance();
 		scheduler.register('0 * * * *', async () => {
 			// Process modpacks, hourly.
 			await ftbApi.startProcessing();
+			await curseforgeApi.startProcessing();
 		});
 	}
 }
