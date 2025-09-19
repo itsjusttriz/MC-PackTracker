@@ -1,9 +1,11 @@
-import { DrizzleDB } from '../../drizzle';
 import {
 	SlashCommandBuilder,
 	type ChatInputCommandInteraction,
 	type GuildMember,
 } from 'discord.js';
+
+import { DrizzleDB } from '../../drizzle';
+
 import CommandBase from './CommandBase';
 
 export default class extends CommandBase {
@@ -39,19 +41,18 @@ export default class extends CommandBase {
 
 		const trackerId = i.options.getString(this.TRACKER_ID_OPTION, true);
 
-		const [foundTracker] = await db.getTrackedModpackById(trackerId);
-		if (!foundTracker) {
-			await i.editReply(
-				':x: Could not find an existing tracker with this ID. Does it exist?'
-			);
+		const storedTrackers = await db.getTrackedModpackById(trackerId);
+		if (!storedTrackers.length) {
+			const err = `:x: Could not find an existing tracker with an ID of \`${trackerId}\`. Does it exist?`;
+			await i.editReply(err);
 			return;
 		}
 
-		const wasDeleted = await db.deleteTrackedModpackById(foundTracker.id);
+		const tracker = storedTrackers[0];
+		const wasDeleted = await db.deleteTrackedModpackById(tracker.id);
 		if (!wasDeleted) {
-			await i.editReply(
-				'Failed to delete this tracker. Please contact support.'
-			);
+			const err = `Failed to delete tracker with ID of \`${tracker.id}\`. Try again or contact support.`;
+			await i.editReply(err);
 			return;
 		}
 
