@@ -32,7 +32,7 @@ export class DiscordReadyEvent {
 
 		const scheduler = CronService.getInstance();
 		scheduler.register('0 * * * *', async () => {
-			// Process modpacks, hourly.
+			// Process modpacks, hourly, ON the hour.
 			await ftbApi.startProcessing();
 			await curseforgeApi.startProcessing();
 		});
