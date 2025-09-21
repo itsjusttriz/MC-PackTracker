@@ -18,17 +18,18 @@ import { EnvService } from '../services/EnvService';
 export class DiscordBot {
 	private static instance: DiscordBot;
 
-	private readonly _token: string;
-
-	public commands: CommandCollection = new Collection<string, CommandData>();
-	public readonly _client = new Client({
-		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
-	});
-
 	public static getInstance() {
 		if (!DiscordBot.instance) DiscordBot.instance = new DiscordBot();
 		return DiscordBot.instance;
 	}
+
+	private readonly _token: string;
+
+	public BOT_OWNER_ID = '228167686293553164';
+	public commands: CommandCollection = new Collection<string, CommandData>();
+	public readonly _client = new Client({
+		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+	});
 
 	private constructor() {
 		const env = EnvService.getInstance();

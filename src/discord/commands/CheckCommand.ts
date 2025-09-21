@@ -4,6 +4,7 @@ import {
 } from 'discord.js';
 
 import CommandBase from './CommandBase';
+import { DiscordBot } from '..';
 
 export default class extends CommandBase {
 	metadata = new SlashCommandBuilder()
@@ -13,7 +14,13 @@ export default class extends CommandBase {
 		)
 		.toJSON();
 
-	handle(i: ChatInputCommandInteraction) {
+	async handle(i: ChatInputCommandInteraction) {
+		const discordBot = DiscordBot.getInstance();
+		if (i.user.id !== discordBot.BOT_OWNER_ID) {
+			await i.editReply(`You cannot use this command.`);
+			return;
+		}
+
 		i.editReply({
 			content: 'Coming soon!',
 		});
