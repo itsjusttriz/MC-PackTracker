@@ -49,23 +49,40 @@ export class DiscordBot {
 		return this._client.login(this._token);
 	}
 
-	private _getUniqueUserIds() {
-		const guilds = [...this._client.guilds.cache.values()];
-		const guildMembers = guilds.map((guild) =>
-			[...guild.members.cache.values()].map((member) => member.user.id)
-		);
-		return new Set(guildMembers.flat()).size;
+	private async _getUniqueUserIds() {
+		const guilds = await this._client.guilds.fetch();
+
+		const uniqueUserIds = new Set();
+
+		for (const [, guild] of guilds) {
+			try {
+				const fullGuild = await guild.fetch();
+				const members = await fullGuild.members.fetch();
+
+				members.forEach((member: any) => {
+					uniqueUserIds.add(member.user.id);
+				});
+			} catch (error) {
+				console.error(
+					`Failed to fetch members for guild ${guild.name}:`,
+					error
+				);
+			}
+		}
+
+		return uniqueUserIds.size;
 	}
 
 	startPresenceLoop() {
 		// TODO: Add more options to this.
 		const snippets = [
-			'Watching feed-the-beast.com/modpacks',
-			'CurseForgeAPI soonTM',
+			'Watching feed-the-beast.com',
+			'Watching curseforge.com',
 		];
 
-		const userCount = this._getUniqueUserIds();
-		snippets.push(`Serving ${userCount} users!`);
+		this._getUniqueUserIds().then((userCount) => {
+			snippets.push(`Serving ${userCount} users!`);
+		});
 
 		const run = () => {
 			const snippet =
