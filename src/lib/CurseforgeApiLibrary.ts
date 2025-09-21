@@ -145,7 +145,10 @@ export class CurseforgeApi extends BaseApiLibrary {
 			image: data.logo.url,
 		} as CurseforgeModpack;
 
-		const latest = data.latestFiles[0];
+		const latest = data.latestFiles.sort(
+			(a: any, b: any) =>
+				new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()
+		)[0];
 
 		newData.latest = {
 			id: latest.id,
