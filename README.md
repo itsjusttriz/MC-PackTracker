@@ -1,6 +1,6 @@
 # Welcome
 
-Discord notifier bot for modpack updates, from FTB.
+Discord notifier bot for modpack updates, from Curseforge & FTB.
 
 Get (_somewhat_) real-time update notifications for your chosen modpacks, avoiding the clutter of official channels.
 
