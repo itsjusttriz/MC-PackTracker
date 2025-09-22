@@ -4,6 +4,7 @@ import {
 } from 'discord.js';
 import { DrizzleDB } from '../../drizzle';
 import CommandBase from './CommandBase';
+import { DiscordBot } from '..';
 
 export default class extends CommandBase {
 	metadata = new SlashCommandBuilder()
@@ -25,7 +26,9 @@ export default class extends CommandBase {
 
 	async handle(i: ChatInputCommandInteraction) {
 		const isGuildOwner = i.user.id === i.guild!.ownerId;
-		if (!isGuildOwner) {
+		// TODO: Fix this later.
+		const isBotOwner = i.user.id === '228167686293553164';
+		if (!isGuildOwner && !isBotOwner) {
 			await i.editReply(
 				`Sorry. Only the server's owner can interact with this.`
 			);
