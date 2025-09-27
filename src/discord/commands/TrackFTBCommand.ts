@@ -29,8 +29,8 @@ export default class extends CommandBase {
 
 		const { roles: userRoles } = i.member! as GuildMember;
 		const canEditTrackers =
-			(guildSettings?.editorRoleId &&
-				userRoles.cache.has(guildSettings.editorRoleId)) ??
+			guildSettings?.editorRoleId &&
+			userRoles.cache.has(guildSettings.editorRoleId) &&
 			i.guild!.ownerId === i.user.id;
 
 		if (!canEditTrackers) {
