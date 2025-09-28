@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios';
 import { EnvService } from '../services/EnvService';
+import { DiscordBot } from '../discord';
 
 export class BaseApiLibrary {
 	protected http: AxiosInstance;
@@ -22,13 +23,18 @@ export class BaseApiLibrary {
 			});
 			return req.data;
 		} catch (error: any) {
-			console.error(
-				'Error fetching modpack:',
-				id,
-				'-',
-				error.response.status,
-				error.response.statusText
-			);
+			console.error('Error fetching modpack:', id);
+			console.error(error);
+
+			const discordBot = DiscordBot.getInstance();
+			await discordBot
+				.dmOwner(
+					`Error fetching modpack via ${this.constructor.name} with id: ${id}\n\`\`\`\n${error.message}\n\`\`\``
+				)
+				.catch(() =>
+					console.log('failed to DM Triz with above error.')
+				);
+
 			return null;
 		}
 	}

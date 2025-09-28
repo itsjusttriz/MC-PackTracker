@@ -2,6 +2,7 @@ import {
 	ActivityType,
 	Client,
 	Collection,
+	EmbedBuilder,
 	Events,
 	GatewayIntentBits,
 	type Interaction,
@@ -18,17 +19,18 @@ import { EnvService } from '../services/EnvService';
 export class DiscordBot {
 	private static instance: DiscordBot;
 
-	private readonly _token: string;
-
-	public commands: CommandCollection = new Collection<string, CommandData>();
-	public readonly _client = new Client({
-		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
-	});
-
-	public static getInstance() {
+	static getInstance() {
 		if (!DiscordBot.instance) DiscordBot.instance = new DiscordBot();
 		return DiscordBot.instance;
 	}
+
+	commands: CommandCollection = new Collection<string, CommandData>();
+	readonly OWNER_ID = '228167686293553164';
+	readonly _client = new Client({
+		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+	});
+
+	private readonly _token: string;
 
 	private constructor() {
 		const env = EnvService.getInstance();
@@ -96,5 +98,29 @@ export class DiscordBot {
 			Helpers.wait(interval).then(run);
 		};
 		run();
+	}
+
+	async dmOwner(message: string) {
+		// this._client.users.fetch(this.OWNER_ID).then(user => user.dmChannel?.send(options));
+		const user = await this._client.users.fetch(this.OWNER_ID);
+		const dm = user.dmChannel;
+
+		if (dm) {
+			const MAX_CHAR = 4096;
+			const text =
+				message.length > MAX_CHAR
+					? message.slice(0, MAX_CHAR - 3) + '...'
+					: message;
+
+			const embed = new EmbedBuilder()
+				.setTitle('Uh oh!')
+				.setDescription(text)
+				.setColor('Red');
+
+			const msgSent = await dm.send({
+				embeds: [embed],
+			});
+			console.log('DM sent to Triz ->', msgSent.id);
+		}
 	}
 }
