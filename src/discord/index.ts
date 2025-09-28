@@ -27,7 +27,11 @@ export class DiscordBot {
 	commands: CommandCollection = new Collection<string, CommandData>();
 	readonly OWNER_ID = '228167686293553164';
 	readonly _client = new Client({
-		intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+		intents: [
+			GatewayIntentBits.Guilds,
+			GatewayIntentBits.GuildMessages,
+			GatewayIntentBits.GuildMembers,
+		],
 	});
 
 	private readonly _token: string;
