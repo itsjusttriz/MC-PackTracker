@@ -70,7 +70,7 @@ export class DiscordBot {
 				});
 			} catch (error) {
 				console.error(
-					`Failed to fetch members for guild ${guild.name}:`,
+					`Failed to fetch members for guild "${guild.name}:"`,
 					error
 				);
 			}
@@ -105,7 +105,6 @@ export class DiscordBot {
 	}
 
 	async dmOwner(message: string) {
-		// this._client.users.fetch(this.OWNER_ID).then(user => user.dmChannel?.send(options));
 		const user = await this._client.users.fetch(this.OWNER_ID);
 		const dm = user.dmChannel;
 

@@ -33,8 +33,16 @@ export class DiscordReadyEvent {
 		const scheduler = CronService.getInstance();
 		scheduler.register('0 * * * *', async () => {
 			// Process modpacks, hourly, ON the hour.
+			let startTime = Date.now();
+			console.log('Hourly modpack check STARTED.');
+
 			await ftbApi.startProcessing();
 			await curseforgeApi.startProcessing();
+
+			console.log(
+				'Hourly modpack check FINISHED.',
+				`${Date.now() - startTime}ms`
+			);
 		});
 	}
 }

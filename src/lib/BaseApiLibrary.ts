@@ -15,6 +15,8 @@ export class BaseApiLibrary {
 	}
 
 	async fetch(id: string) {
+		console.log(`Trying to fetch ${id} for ${this.constructor.name}.`);
+
 		try {
 			const req = await this.http.get(`/${id}`, {
 				validateStatus: function (status) {
