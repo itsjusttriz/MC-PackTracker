@@ -7,7 +7,7 @@ export class BaseApiLibrary {
 	constructor(env: EnvService, baseURL: string) {
 		this.http = axios.create({
 			baseURL,
-			timeout: 1000,
+			timeout: 1000 * 10,
 			headers: {
 				'User-Agent': env.agent,
 			},
