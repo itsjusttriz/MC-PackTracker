@@ -26,7 +26,7 @@ export class BaseApiLibrary {
 			return req.data;
 		} catch (error: any) {
 			console.error('Error fetching modpack:', id);
-			console.error(error);
+			console.error(error.message);
 
 			const discordBot = DiscordBot.getInstance();
 			await discordBot
