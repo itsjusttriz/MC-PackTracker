@@ -39,18 +39,18 @@ export default class extends CommandBase {
 		let modpackId = i.options.getInteger('modpack-id', true)?.toString();
 
 		const curseforgeApi = CurseforgeApi.getInstance();
-		const { data: req } = await curseforgeApi.fetch(modpackId);
+		const req = await curseforgeApi.fetch(modpackId);
 
 		// console.log(req);
 
-		if (req?.id?.toString() !== modpackId) {
+		if (req?.data?.id?.toString() !== modpackId) {
 			await i.editReply(
 				`:x: Could not find a modpack with the id: ${modpackId}.`
 			);
 			return;
 		}
 
-		const converted = curseforgeApi.convertRequestData(req);
+		const converted = curseforgeApi.convertRequestData(req.data);
 
 		const [existingTracker] = await db.getTrackedModpack(
 			modpackId,
