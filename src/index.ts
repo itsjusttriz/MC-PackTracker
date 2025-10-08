@@ -6,7 +6,7 @@ console.log = function (...args) {
 	oldLog(new Date().toISOString(), '|', ...args);
 };
 
-export class MCPackTracker {
+class MCPackTracker {
 	static async start() {
 		const discordBot = DiscordBot.getInstance();
 		await discordBot.login();
