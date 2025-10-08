@@ -12,7 +12,7 @@ export const schema = {
 			.unique()
 			.primaryKey()
 			.$defaultFn(() => Helpers.uid()),
-		launcher: text().$type<'curseforge' | 'ftb' | 'undefined'>(),
+		launcher: text().notNull().$type<'curseforge' | 'ftb'>(),
 		modpackId: text().notNull(),
 		latestModpackVersionId: text(),
 		channelId: text().notNull(),
