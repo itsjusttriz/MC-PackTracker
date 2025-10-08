@@ -6,6 +6,7 @@ import { EnvironmentValidationError } from '../util/errors';
 
 config({
 	path: resolve(__dirname, '../../.env'),
+	quiet: true,
 });
 
 const schema = z.object({
