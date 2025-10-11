@@ -1,11 +1,8 @@
-import type {
-	ChatInputCommandInteraction,
-	Client,
-	Collection,
-	SlashCommandBuilder,
+import {
+	type ChatInputCommandInteraction,
+	type Collection,
+	type SlashCommandBuilder,
 } from 'discord.js';
-
-export type DiscordReadyClient = Client<true>;
 
 export type CommandData = {
 	metadata: ReturnType<SlashCommandBuilder['toJSON']>;
@@ -13,8 +10,3 @@ export type CommandData = {
 };
 
 export type CommandCollection = Collection<string, CommandData>;
-
-export type HandlerContext = {
-	client: Client;
-	commands: CommandCollection;
-};
