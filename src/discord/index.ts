@@ -8,13 +8,13 @@ import {
 	type Interaction,
 } from 'discord.js';
 
-import { DiscordReadyEvent } from './events/DiscordReadyEvent';
 import { DiscordInteractionCreateEvent } from './events/DiscordInteractionCreateEvent';
+import { DiscordReadyEvent } from './events/DiscordReadyEvent';
 
 import { Helpers } from '../util/helpers';
 
-import type { CommandCollection, CommandData } from './types';
 import { EnvService } from '../services/EnvService';
+import type { CommandData } from './types';
 
 export class DiscordBot {
 	private static instance: DiscordBot;
@@ -24,7 +24,7 @@ export class DiscordBot {
 		return DiscordBot.instance;
 	}
 
-	commands: CommandCollection = new Collection<string, CommandData>();
+	commands = new Collection<string, CommandData>();
 	readonly OWNER_ID = '228167686293553164';
 	readonly _client = new Client({
 		intents: [
