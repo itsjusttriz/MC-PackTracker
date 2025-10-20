@@ -25,17 +25,13 @@ export class BaseApiLibrary {
 			});
 			return req.data;
 		} catch (error: any) {
-			console.error('Error fetching modpack:', id);
-			console.error(error.message);
+			let errText = `Error fetching modpack via ${this.constructor.name} with id: ${id}`;
+			errText += `\n\`\`\`\n${error.message}\n\`\`\``;
+
+			console.error(errText);
 
 			const discordBot = DiscordBot.getInstance();
-			await discordBot
-				.dmOwner(
-					`Error fetching modpack via ${this.constructor.name} with id: ${id}\n\`\`\`\n${error.message}\n\`\`\``
-				)
-				.catch(() =>
-					console.log('failed to DM Triz with above error.')
-				);
+			await discordBot.dmOwner(errText);
 
 			return null;
 		}

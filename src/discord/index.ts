@@ -44,7 +44,7 @@ export class DiscordBot {
 	login() {
 		const listeners = {
 			[Events.ClientReady]: () => new DiscordReadyEvent(),
-			[Events.InteractionCreate]: (i: Interaction) =>
+			[Events.InteractionCreate]: (i: any) =>
 				new DiscordInteractionCreateEvent(i),
 		};
 
@@ -105,20 +105,26 @@ export class DiscordBot {
 	}
 
 	async dmOwner(message: string) {
-		const MAX_CHAR = 4096;
-		const text =
-			message.length >= MAX_CHAR
-				? message.slice(0, MAX_CHAR - 3) + '...'
-				: message;
+		try {
+			const MAX_CHAR = 4096;
+			const text =
+				message.length >= MAX_CHAR
+					? message.slice(0, MAX_CHAR - 3) + '...'
+					: message;
 
-		const embed = new EmbedBuilder()
-			.setTitle('Uh oh!')
-			.setDescription(text)
-			.setColor('Red');
+			const embed = new EmbedBuilder()
+				.setTitle('Uh oh!')
+				.setDescription(text)
+				.setColor('Red');
 
-		const msgSent = await this._client.users.send(this.OWNER_ID, {
-			embeds: [embed],
-		});
-		console.log('DM sent to Triz ->', msgSent.id);
+			const msgSent = await this._client.users.send(this.OWNER_ID, {
+				embeds: [embed],
+			});
+			console.log('DM sent to Triz ->', msgSent.id);
+		} catch (error) {
+			console.warn(
+				`Failed to send Direct Message to Triz with an error - ${message}`
+			);
+		}
 	}
 }

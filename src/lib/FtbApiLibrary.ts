@@ -91,10 +91,18 @@ export class FtbApi extends BaseApiLibrary {
 		const channel = guild!.channels.cache.get(
 			dbItem.channelId
 		) as GuildTextBasedChannel;
-		await channel.send({
-			embeds: [embed],
-			components: [actionRow],
-		});
+		await channel
+			.send({
+				embeds: [embed],
+				components: [actionRow],
+			})
+			.catch((error) =>
+				discordBot.dmOwner(
+					`Failed to post in channel (${channel.guild.id}->${
+						channel.id
+					}): ${error.message || 'Unknown reason'}`
+				)
+			);
 
 		const db = DrizzleDB.getInstance();
 
