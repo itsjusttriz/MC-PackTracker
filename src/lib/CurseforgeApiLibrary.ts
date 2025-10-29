@@ -95,20 +95,30 @@ export class CurseforgeApi extends BaseApiLibrary {
 			dbItem.channelId
 		) as GuildTextBasedChannel;
 
-		await channel
-			.send({
-				embeds: [embed],
-				components: [actionRow],
-			})
-			.catch((error) =>
-				discordBot.dmOwner(
-					`Failed to post in channel (${channel.guild.id}->${
-						channel.id
-					}): ${error.message || 'Unknown reason'}`
-				)
-			);
-
 		const db = DrizzleDB.getInstance();
+
+		if (channel) {
+			await channel
+				.send({
+					embeds: [embed],
+					components: [actionRow],
+				})
+				.catch((error) =>
+					discordBot.dmOwner(
+						`Failed to post in channel (${channel.guild.id}->${
+							channel.id
+						}): ${error.message || 'Unknown reason'}`
+					)
+				);
+		} else {
+			console.log(
+				`[CurseforgeApi] Deleting tracker #${dbItem.id} from ${
+					guild!.name
+				} as channel #${dbItem.channelId} no longer exists.`
+			);
+			await db.deleteTrackedModpackById(dbItem.id);
+			return;
+		}
 
 		const updatedInDb = await db.updateTrackedModpackLatestId(
 			String(modpack.id),
