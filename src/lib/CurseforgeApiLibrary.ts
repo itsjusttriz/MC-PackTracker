@@ -10,7 +10,6 @@ import { DrizzleDB } from '../drizzle';
 import type { schema } from '../drizzle/schema';
 import { EnvService } from '../services/EnvService';
 import { BaseApiLibrary } from './BaseApiLibrary';
-import { error } from 'console';
 
 type CurseforgeModpack = {
 	id: number;
@@ -45,48 +44,52 @@ export class CurseforgeApi extends BaseApiLibrary {
 		this.http.defaults.headers.get['x-api-key'] = env.curseforgeToken;
 	}
 
+	private getEmbed(trackerId: string, pack: CurseforgeModpack) {
+		const embed = new EmbedBuilder();
+		embed.setColor('#b46000');
+		embed.setAuthor({
+			name: pack.name,
+			iconURL: this.ICON_URL,
+			url: pack.url,
+		});
+		embed.setDescription('New File Released!');
+		embed.setThumbnail(pack.image);
+		embed.addFields([
+			{
+				name: 'File Name',
+				value: pack.latest.version,
+				inline: true,
+			},
+			{
+				name: 'Modloader',
+				value: pack.latest.modloader,
+				inline: true,
+			},
+		]);
+		embed.setFooter({ text: `Tracker ID: ${trackerId}` });
+		// embed.setTimestamp(now); //TODO: Change this to modpack update timestamp.
+
+		return embed;
+	}
+
 	public testForVersionChange = async (
 		dbItem: typeof schema.trackedModpacks.$inferSelect,
-		modpack: CurseforgeModpack,
-		now: number
+		modpack: CurseforgeModpack
 	) => {
 		const oldVersion = dbItem.latestModpackVersionId;
 		const newMatchesOld =
 			oldVersion && oldVersion === String(modpack.latest.id);
 		if (newMatchesOld) return;
 
-		const embed = new EmbedBuilder()
-			.setColor('#b46000')
-			.setAuthor({
-				name: modpack.name,
-				iconURL: this.ICON_URL,
-				url: modpack.url,
-			})
-			.setDescription('New File Released!')
-			.setThumbnail(modpack.image)
-			.addFields([
-				{
-					name: 'File Name',
-					value: modpack.latest.version,
-					inline: true,
-				},
-				{
-					name: 'Modloader',
-					value: modpack.latest.modloader,
-					inline: true,
-				},
-			])
-			.setFooter({ text: `Tracker ID: ${dbItem.id}` })
-			.setTimestamp(now);
+		const embed = this.getEmbed(dbItem.id, modpack);
 
-		const visitButton = new ButtonBuilder()
-			.setStyle(ButtonStyle.Link)
-			.setLabel('Visit Project Page')
-			.setURL(modpack.url);
+		const visitButton = new ButtonBuilder();
+		visitButton.setStyle(ButtonStyle.Link);
+		visitButton.setLabel('Visit Project Page');
+		visitButton.setURL(modpack.url);
 
-		const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			visitButton
-		);
+		const actionRow = new ActionRowBuilder<ButtonBuilder>();
+		actionRow.addComponents(visitButton);
 
 		const discordBot = DiscordBot.getInstance();
 
@@ -97,28 +100,36 @@ export class CurseforgeApi extends BaseApiLibrary {
 
 		const db = DrizzleDB.getInstance();
 
-		if (channel) {
-			await channel
-				.send({
-					embeds: [embed],
-					components: [actionRow],
-				})
-				.catch((error) =>
-					discordBot.dmOwner(
-						`Failed to post in channel (${channel.guild.id}->${
-							channel.id
-						}): ${error.message || 'Unknown reason'}`
-					)
-				);
-		} else {
-			console.log(
-				`[CurseforgeApi] Deleting tracker #${dbItem.id} from ${
-					guild!.name
-				} as channel #${dbItem.channelId} no longer exists.`
-			);
+		if (!channel) {
+			const msg =
+				'[CurseforgeApi] Deleting tracker {tracker.id} from {guild.name} as channel {channel.id} no longer exists.'
+					.replace('{tracker.id}', dbItem.id)
+					.replace('{guild.name}', guild!.name)
+					.replace('{channel.id}', dbItem.channelId);
+
+			console.log(msg);
+
 			await db.deleteTrackedModpackById(dbItem.id);
 			return;
 		}
+
+		await channel
+			.send({
+				embeds: [embed],
+				components: [actionRow],
+			})
+			.catch(async (error) => {
+				const msg =
+					'Failed to send update notification to {guild} -> {channel} -- Reason: {error}'
+						.replace('{guild}', `[${guild.name}](${guild.id})`)
+						.replace(
+							'{channelId}',
+							`[${channel.name}](${channel.id})`
+						)
+						.replace('{error}', error?.message || 'Unknown');
+
+				await discordBot.dmOwner(msg);
+			});
 
 		const updatedInDb = await db.updateTrackedModpackLatestId(
 			String(modpack.id),
@@ -138,8 +149,6 @@ export class CurseforgeApi extends BaseApiLibrary {
 		let modpacks = await db.getAllTrackedModpacks();
 		modpacks = modpacks.filter((mp) => mp.launcher === 'curseforge');
 
-		const startTime = Date.now();
-
 		for (const pack of modpacks) {
 			if (!this.cache.has(+pack.modpackId)) {
 				const { data } = await this.fetch(pack.modpackId);
@@ -149,8 +158,7 @@ export class CurseforgeApi extends BaseApiLibrary {
 			}
 			await this.testForVersionChange(
 				pack,
-				this.cache.get(+pack.modpackId)!,
-				startTime
+				this.cache.get(+pack.modpackId)!
 			);
 			await new Promise((res) => setTimeout(res, 5000));
 		}
