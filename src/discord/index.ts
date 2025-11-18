@@ -35,10 +35,10 @@ export class DiscordBot {
 	});
 
 	private readonly _token: string;
+	private readonly _env = EnvService.getInstance();
 
 	private constructor() {
-		const env = EnvService.getInstance();
-		this._token = env.discordToken;
+		this._token = this._env.discordToken;
 	}
 
 	login() {
@@ -105,6 +105,7 @@ export class DiscordBot {
 	}
 
 	async dmOwner(message: string) {
+		if (!this._env.shouldDmOnError) return;
 		try {
 			const MAX_CHAR = 4096;
 			const text =

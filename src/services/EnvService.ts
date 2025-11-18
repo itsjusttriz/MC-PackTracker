@@ -15,6 +15,7 @@ const schema = z.object({
 	DISCORD_TOKEN: z.string().nonempty('DISCORD_TOKEN is required'),
 	CURSEFORGE_TOKEN: z.string().nonempty('CURSEFORGE_TOKEN is required'),
 	AGENT: z.string(),
+	DM_ON_ERROR: z.boolean().nonempty('DM_ON_ERROR is required')
 });
 export type EnvObject = z.infer<typeof schema>;
 export class EnvService {
@@ -51,5 +52,8 @@ export class EnvService {
 	}
 	get agent() {
 		return this._data.AGENT;
+	}
+	get shouldDmOnError() {
+		return this._data.DM_ON_ERROR;
 	}
 }
